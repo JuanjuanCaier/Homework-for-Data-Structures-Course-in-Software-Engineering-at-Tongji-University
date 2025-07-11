@@ -1,0 +1,115 @@
+#include <iostream>
+
+class MyString {
+private:
+    char* data;
+    size_t length;
+
+public:
+    // 默认构造函数
+    MyString() : data(nullptr), length(0) {}
+
+    // 构造函数，从C风格字符串初始化
+    MyString(const char* str) {
+        if (str) {
+            // 手动计算字符串长度
+            length = 0;
+            while (str[length] != '\0') {
+                ++length;
+            }
+
+            data = new char[length + 1];  // 为'\0'留出空间
+            for (size_t i = 0; i < length; ++i) {
+                data[i] = str[i];
+            }
+            data[length] = '\0'; // 添加字符串结束符
+        }
+        else {
+            data = nullptr;
+            length = 0;
+        }
+    }
+
+    // 拷贝构造函数
+    MyString(const MyString& other) {
+        length = other.length;
+        data = new char[length + 1];
+        for (size_t i = 0; i < length; ++i) {
+            data[i] = other.data[i];
+        }
+        data[length] = '\0'; // 添加字符串结束符
+    }
+
+    // 赋值运算符重载
+    MyString& operator=(const MyString& other) {
+        if (this != &other) { // 避免自我赋值
+            delete[] data;  // 释放原来的内存
+            length = other.length;
+            data = new char[length + 1];
+            for (size_t i = 0; i < length; ++i) {
+                data[i] = other.data[i];
+            }
+            data[length] = '\0'; // 添加字符串结束符
+        }
+        return *this;
+    }
+
+    // 析构函数
+    ~MyString() {
+        delete[] data;
+    }
+
+    // 获取字符串长度
+    size_t size() const {
+        return length;
+    }
+
+    // 获取C风格字符串（用于输出）
+    const char* c_str() const {
+        return data;
+    }
+
+    // 输出字符串
+    void print() const {
+        if (data) {
+            for (size_t i = 0; i < length; ++i) {
+                std::cout << data[i];
+            }
+            std::cout << std::endl;
+        }
+        else {
+            std::cout << "(null)" << std::endl;
+        }
+    }
+
+    // 比较两个字符串
+    bool operator==(const MyString& other) const {
+        if (length != other.length) {
+            return false;
+        }
+        for (size_t i = 0; i < length; ++i) {
+            if (data[i] != other.data[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 拼接两个字符串
+    MyString operator+(const MyString& other) const {
+        MyString newStr;
+        newStr.length = length + other.length;
+        newStr.data = new char[newStr.length + 1];
+
+        size_t i = 0;
+        for (; i < length; ++i) {
+            newStr.data[i] = data[i];
+        }
+        for (size_t j = 0; j < other.length && i < newStr.length; ++j, ++i) {
+            newStr.data[i] = other.data[j];
+        }
+        newStr.data[newStr.length] = '\0';
+
+        return newStr;
+    }
+};
